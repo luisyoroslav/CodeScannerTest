@@ -15,13 +15,13 @@
             
         />
         <skia:SKLottieView
-            Source="scanning-02.json"
+            Source="scanning-04.json"
             RepeatCount="-1"
             IsEnabled="{Binding Path= IsDetecting, Source={Reference BarcodeView}}"
             IsVisible="{Binding Path= IsDetecting, Source={Reference BarcodeView}}"
             HorizontalOptions="Fill"
               VerticalOptions="Fill"
-            Margin="50"
+            Margin="10" 
             Grid.Row="1" />    
 <!--<Rectangle Fill="#1132CD32"
             Stroke="#32CD32"
