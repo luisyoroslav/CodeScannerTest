@@ -1,6 +1,7 @@
 ﻿#if IOS
 using AVFoundation;
 #endif
+using System.Diagnostics;
 using Microsoft.Maui.Controls;
 using Plugin.Maui.Audio;
 using ZXing;
@@ -17,64 +18,111 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
 
-        barcodeView.Options = new BarcodeReaderOptions
+        BarcodeView.Options = new BarcodeReaderOptions
         {
-            Formats = BarcodeFormats.All,
+            Formats = ZXing.Net.Maui.BarcodeFormat.QrCode,
             AutoRotate = true,
+            //TryHarder = true
+            //AutoRotate = true,
+            //TryInverted = true,
+            //TryHarder = true,
         };
     }
+    private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+    private string? _lastValue = null;
 
     private async void BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
     {
+
+        await _semaphore.WaitAsync();
         //foreach (var barcode in e.Results)
         //    Console.WriteLine($"Barcodes: {barcode.Format} -> {barcode.Value}");
-
-        var first = e.Results?.FirstOrDefault();
-        if (first is null) return;
-        await PlayAudioAsync();
-        Dispatcher.Dispatch(() =>
+        try
         {
-            // Update BarcodeGeneratorView
-            barcodeGenerator.ClearValue(BarcodeGeneratorView.ValueProperty);
-            barcodeGenerator.Format = first.Format;
-            barcodeGenerator.Value = first.Value;
-                    
-                    
-            // Update Label
-            ResultLabel.Text = $"Barcodes: {first.Format} -> {first.Value}";
+            var first = e.Results?.FirstOrDefault();
+            if (first is null) return;
 
+            BarcodeView.IsDetecting = false;
+            var newValue = $"{first.Format}|{first.Value}";
 
-            if (first.Value.StartsWith("http"))
+            if (newValue == _lastValue) return;
+            _lastValue = newValue;
+            var tasks = new List<Task>
             {
-                
-            }
-
-            //var parsed =  ResultParser.parseResult(new Result(first.Value, first.Raw,
-            //    first.PointsOfInterest.Select(p => new ResultPoint(p.X, p.Y)).ToArray(),
-            //    BarcodeFormat.QR_CODE));
+                PlayAudioAsync(),
+                Dispatcher.DispatchAsync(() =>
+                {
+                    Vibration.Default.Vibrate(TimeSpan.FromSeconds(5));
+                    //HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
+                    // Update BarcodeGeneratorView
+                    BarcodeGenerator.ClearValue(BarcodeGeneratorView.ValueProperty);
+                    //barcodeGenerator.Format = first.Format;
+                    BarcodeGenerator.Value = first.Value;
+                    //first.PointsOfInterest[0]
+                    // Update Label
+                    ResultLabel.Text = $"Barcodes: {first.Format} -> {first.Value} \r\n";
+                    ResultLabel.Text += $"Points: {string.Join(";",first.PointsOfInterest.Select(s => $"({s.X},{s.Y})"))} \r\n";
                     
-        });
+                    Vibration.Default.Cancel();
+                    //var parsed =  ResultParser.parseResult(new Result(first.Value, first.Raw,
+                    //    first.PointsOfInterest.Select(p => new ResultPoint(p.X, p.Y)).ToArray(),
+                    //    BarcodeFormat.QR_CODE));
+                })
+            };
+            await Task.WhenAll(tasks);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception);
+            throw;
+        }
+        finally
+        {
+            _semaphore.Release();
+            BarcodeView.IsDetecting = true;
+        }
+        
+        
     }
 
     public async Task PlayAudioAsync()
     {
 #if IOS
-    AVFoundation.AVAudioSession.SharedInstance().SetCategory(AVFoundation.AVAudioSessionCategory.Playback);
+    //AVFoundation.AVAudioSession.SharedInstance().SetCategory(AVFoundation.AVAudioSessionCategory.Playback);
 #endif
+        
         using var audioPlayer = AudioManager
             .Current
-            .CreatePlayer(await FileSystem.OpenAppPackageFileAsync("short-beep-tone.mp3"));
+            .CreatePlayer( await FileSystem.OpenAppPackageFileAsync("beep-01.mp3"), new AudioPlayerOptions
+            {
+#if IOS || MACCATALYST
+                CategoryOptions = AVFoundation.AVAudioSessionCategoryOptions.MixWithOthers
+#endif
+            });
+        //audioPlayer.Volume = 1;
+        //var tcs = new TaskCompletionSource<bool>();
+        //audioPlayer.PlaybackEnded += (sender, args) =>
+        //{
+        //    tcs.SetResult(true);
+        //    audioPlayer.Dispose();
+        //};
+        await audioPlayer.PlayAsync();
 
-        audioPlayer.Play();
+        //await tcs.Task.ConfigureAwait(false);
     }
 
     void SwitchCameraButton_Clicked(object sender, EventArgs e)
     {
-        barcodeView.CameraLocation = barcodeView.CameraLocation == CameraLocation.Rear ? CameraLocation.Front : CameraLocation.Rear;
+        BarcodeView.CameraLocation = BarcodeView.CameraLocation == CameraLocation.Rear ? CameraLocation.Front : CameraLocation.Rear;
     }
 
     void TorchButton_Clicked(object sender, EventArgs e)
     {
-        barcodeView.IsTorchOn = !barcodeView.IsTorchOn;
+        BarcodeView.IsTorchOn = !BarcodeView.IsTorchOn;
+    }
+
+    private void BarcodeView_OnFrameReady(object? sender, CameraFrameBufferEventArgs e)
+    {
+        Debug.WriteLine("BarcodeView_OnFrameReady");
     }
 }

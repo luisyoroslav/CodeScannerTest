@@ -30,7 +30,20 @@ namespace CodeScannerTest
 #endif
             builder
                 .UseBarcodeReader()
-                .AddAudio();
+                .AddAudio(playbackOptions =>
+                    {
+#if IOS || MACCATALYST
+                        playbackOptions.Category = AVFoundation.AVAudioSessionCategory.Playback;
+#endif
+                    },
+                    recordingOptions =>
+                    {
+#if IOS || MACCATALYST
+                        recordingOptions.Category = AVFoundation.AVAudioSessionCategory.Record;
+                        recordingOptions.Mode = AVFoundation.AVAudioSessionMode.Default;
+                        recordingOptions.CategoryOptions = AVFoundation.AVAudioSessionCategoryOptions.MixWithOthers;
+#endif
+                    });
             return builder.Build();
         }
 

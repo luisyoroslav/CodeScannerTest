@@ -41,7 +41,7 @@
 	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios'">
 	  <ProvisioningType>manual</ProvisioningType>
 	  <CodesignKey>Apple Development: Luis Yoroslav (8L9S82CVT9)</CodesignKey>
-	  <CodesignProvision></CodesignProvision>
+	  <CodesignProvision>VS: WildCard Development</CodesignProvision>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -63,9 +63,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Raw\beep-104060.mp3" />
-	  <None Remove="Resources\Raw\beep-6-96243.mp3" />
-	  <None Remove="Resources\Raw\short-beep-tone.mp3" />
+	  <None Remove="Resources\Raw\beep-00.mp3" />
+	  <None Remove="Resources\Raw\beep-01.mp3" />
+	  <None Remove="Resources\Raw\beep-02.mp3" />
 	</ItemGroup>
 
 	<ItemGroup>

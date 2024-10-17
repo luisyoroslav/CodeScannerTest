@@ -16,8 +16,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
@@ -28,7 +26,9 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
-    <key>NSCameraUsageDescription</key>
-    <string>This app uses barcode scanning to...</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses barcode scanning to...</string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
 </dict>
 </plist>
