@@ -66,6 +66,9 @@
 	  <None Remove="Resources\Raw\beep-00.mp3" />
 	  <None Remove="Resources\Raw\beep-01.mp3" />
 	  <None Remove="Resources\Raw\beep-02.mp3" />
+	  <None Remove="Resources\Raw\scanning-00.json" />
+	  <None Remove="Resources\Raw\scanning-01.json" />
+	  <None Remove="Resources\Raw\scanning-02.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -73,6 +76,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 		<PackageReference Include="Plugin.Maui.Audio" Version="3.0.1" />
+		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="2.0.0" />
 		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.4.0" />
 	</ItemGroup>
 

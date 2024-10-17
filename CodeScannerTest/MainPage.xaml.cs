@@ -61,7 +61,7 @@ public partial class MainPage : ContentPage
                     //first.PointsOfInterest[0]
                     // Update Label
                     ResultLabel.Text = $"Barcodes: {first.Format} -> {first.Value} \r\n";
-                    ResultLabel.Text += $"Points: {string.Join(";",first.PointsOfInterest.Select(s => $"({s.X},{s.Y})"))} \r\n";
+                    ResultLabel.Text += $"Points: {string.Join("; ",first.PointsOfInterest.Select(s => $"({s.X},{s.Y})"))} \r\n";
                     
                     Vibration.Default.Cancel();
                     //var parsed =  ResultParser.parseResult(new Result(first.Value, first.Raw,
